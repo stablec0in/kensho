@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+pragma solidity ^0.8.19;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./IPool.sol";
+
+contract AaveManager {
+    // pas bon 
+    IPool public immutable lendingPool;
+
+    constructor(address _lendingPool) {
+        lendingPool = IPool(_lendingPool);
+    }
+    function getPosition(address depositAsset, address borrowAsset) public view returns (uint256 deposited, uint256 borrowed) {
+    // Récupérer le dépôt pour l'asset déposé
+    (
+        uint256 currentDepositBalance, , , , , , , 
+    ) = lendingPool.getUserReserveData(depositAsset, address(this));
+
+    // Récupérer l'emprunt pour l'asset emprunté
+    (
+        , uint256 currentBorrowBalance, , , , , , 
+    ) = lendingPool.getUserReserveData(borrowAsset, address(this));
+
+    return (currentDepositBalance, currentBorrowBalance);
+}
+
+
+
+    function depositToAave(address asset, uint256 amount) internal {
+        IERC20(asset).approve(address(lendingPool), amount);
+        lendingPool.supply(asset, amount, address(this), 0);
+    }
+
+    function borrowFromAave(address asset, uint256 amount) internal {
+        lendingPool.borrow(asset, amount, 2, 0, address(this));
+    }
+
+    function repayAave(address asset, uint256 amount) internal {
+        IERC20(asset).approve(address(lendingPool), amount);
+        lendingPool.repay(asset, amount, 2, address(this));
+    }
+
+    function withdrawFromAave(address asset, uint256 amount) internal {
+        lendingPool.withdraw(asset, amount, address(this));
+    }
+}
