@@ -25,7 +25,6 @@ const atoken = "0x625E7708f30cA75bfd92586e17077590C60eb4cD";
 const btoken ="0x4a1c3aD6Ed28a636ee1751C69071f6be75DEb8B8";
 console.log(whype);
 console.log(usdt);
-const provider = new ethers.JsonRpcProvider("https://lb.drpc.org/avalanche/AppnJCL1b0LDhjBuqrEEwA0efgJUSAcR76gBkmBg0PjN");
 
 export async function fetchPositions() {
   const manager = new ethers.Contract(managerAddress, MANAGER_ABI, provider);
